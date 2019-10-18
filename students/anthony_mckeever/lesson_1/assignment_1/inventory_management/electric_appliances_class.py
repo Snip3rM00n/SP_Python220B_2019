@@ -13,7 +13,8 @@ from inventory_class import Inventory
 class ElectricAppliances(Inventory):
     """ An object representing Electric Appliances """
 
-    def __init__(self, product_code, description, market_price, rental_price, brand, voltage):
+    def __init__(self, product_code, description, market_price,
+                 rental_price, brand, voltage):
         """
         Initializes the Electric Appliance class object.
 
@@ -25,8 +26,11 @@ class ElectricAppliances(Inventory):
         :brand:         The brand name of the appliance
         :voltalge:      The voltage required to run the appliance
         """
-        Inventory.__init__(self, product_code, description, market_price, rental_price)
-
+        Inventory.__init__(self,
+                           product_code,
+                           description,
+                           market_price,
+                           rental_price)
 
         self.brand = brand
         self.voltage = voltage
@@ -35,11 +39,7 @@ class ElectricAppliances(Inventory):
         """
         Return a dictionary representing the ElectricAppliance object
         """
-        output_dict = {}
-        output_dict['product_code'] = self.product_code
-        output_dict['description'] = self.description
-        output_dict['market_price'] = self.market_price
-        output_dict['rental_price'] = self.rental_price
+        output_dict = Inventory.return_as_dictionary(self)
         output_dict['brand'] = self.brand
         output_dict['voltage'] = self.voltage
 

@@ -7,6 +7,7 @@ Classes:
     Inventory
 """
 
+
 class Inventory():
     """ A class representing an inventory item. """
 
