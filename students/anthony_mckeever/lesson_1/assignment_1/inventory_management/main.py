@@ -6,10 +6,10 @@ HP Norton Main Application
 
 import sys
 
-import market_prices
-from inventory_class import Inventory
-from furniture_class import Furniture
-from electric_appliances_class import ElectricAppliances
+from .market_prices import MarketPrices
+from .inventory_class import Inventory
+from .furniture_class import Furniture
+from .electric_appliances_class import ElectricAppliances
 
 FULL_INVENTORY = {}
 
@@ -17,8 +17,6 @@ FULL_INVENTORY = {}
 def main_menu():
     """
     Prompt user with the main menu
-
-    :user_prompt:   ??
     """
     valid_prompts = {"1": add_new_item,
                      "2": item_info,
@@ -45,7 +43,7 @@ def add_new_item():
     item_rental_price = input("Enter item rental price: ")
 
     # Get price from the market prices module
-    item_price = market_prices.get_latest_price(item_code)
+    item_price = MarketPrices.get_latest_price(item_code)
 
     is_furniture = input("Is this item a piece of furniture? (Y/N): ")
     if is_furniture.lower() == "y":
@@ -102,8 +100,15 @@ def exit_program():
     sys.exit()
 
 
-if __name__ == '__main__':
+def main():
+    """
+    Executes the main loop of the application
+    """
     while True:
         print(FULL_INVENTORY)
         main_menu()()
         input("Press Enter to continue...........")
+
+
+if __name__ == '__main__':
+    main()
