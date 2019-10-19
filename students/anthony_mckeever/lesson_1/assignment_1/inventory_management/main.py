@@ -1,7 +1,7 @@
 # Launches the user interface for the inventory management system
 
 """
-HP Norton Main Application
+HP Norton Inventory Management Main Application
 """
 
 import sys

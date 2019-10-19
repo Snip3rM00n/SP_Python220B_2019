@@ -199,9 +199,9 @@ class MainTests(TestCase):
         """
         Performs the assertions for the Main.add_new_item function.
         """
-        # Hold the MarketPrices.get_latest_price to restore after mock
-        # no longer needed so MarketPrices unit tests won't inadvertently
-        # fail if execution order is randomized by coverage.py
+        # Hold the MarketPrices.get_latest_price to restore after mock is
+        # no longer needed so MarketPrices unit tests won't inadvertently fail
+        # if execution order is randomized by coverage.py or python unittest
         hold_prices = MarketPrices.get_latest_price
 
         inv_type.return_as_dictionary = MagicMock(return_value="stuff")

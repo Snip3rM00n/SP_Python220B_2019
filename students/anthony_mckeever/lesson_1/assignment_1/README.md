@@ -1,10 +1,10 @@
 # Lesson 1 Assignment 1 - Advanced Unit Testing
 
 ### Minor Details:
-Code Poet: Anthony McKeever
-Start Date: 10/16/2019
-End Date: 10/18/2019
-Redmine Issue: SchoolOps-11
+* Code Poet: Anthony McKeever
+* Start Date: 10/16/2019
+* End Date: 10/18/2019
+* Redmine Issue: SchoolOps-11
 
 ## Application Run Instructions
 
