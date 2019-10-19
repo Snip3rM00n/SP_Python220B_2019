@@ -6,7 +6,7 @@ HP Norton Inventory Management Main Application
 
 import sys
 
-from .market_prices import MarketPrices
+from .market_prices import get_latest_price
 from .inventory_class import Inventory
 from .furniture_class import Furniture
 from .electric_appliances_class import ElectricAppliances
@@ -43,7 +43,7 @@ def add_new_item():
     item_rental_price = input("Enter item rental price: ")
 
     # Get price from the market prices module
-    item_price = MarketPrices.get_latest_price(item_code)
+    item_price = get_latest_price(item_code)
 
     is_furniture = input("Is this item a piece of furniture? (Y/N): ")
     if is_furniture.lower() == "y":

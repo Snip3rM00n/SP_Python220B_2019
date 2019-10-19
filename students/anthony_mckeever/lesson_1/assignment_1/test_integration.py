@@ -15,7 +15,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import inventory_management.main as Main
-from inventory_management.market_prices import MarketPrices as Prices
+import inventory_management.market_prices as Prices
 from inventory_management.inventory_class import Inventory
 from inventory_management.electric_appliances_class import ElectricAppliances
 from inventory_management.furniture_class import Furniture

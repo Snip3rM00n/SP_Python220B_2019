@@ -16,7 +16,7 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import inventory_management.main as Main
-from inventory_management.market_prices import MarketPrices
+import inventory_management.market_prices as MarketPrices
 from inventory_management.inventory_class import Inventory
 from inventory_management.electric_appliances_class import ElectricAppliances
 from inventory_management.furniture_class import Furniture
