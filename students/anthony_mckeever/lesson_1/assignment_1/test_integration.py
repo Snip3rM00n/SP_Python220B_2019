@@ -93,23 +93,46 @@ class TestIntegration(TestCase):
             new_item_msg = "New inventory item added"
             self.assertTrue(std_out.count(new_item_msg) == 1)
 
+            # The number of times the inventory's dictionary item should
+            # appear is 3 based on the steps the application takes.
+            # Once from the main.item_info method.
+            # Twice from the main.main() method loop which prints it with each
+            # iteration of the loop.
             inv_dict = inv.return_as_dictionary()
-            self.assertTrue(std_out.count(str(inv_dict)) == 1)
+            self.assertTrue(std_out.count(str(inv_dict)) == 3)
 
     def get_inputs(self, inv):
         """
         Return the inputs for navigating menus and inputing inventory items.
         """
-        inputs = ["1", inv.product_code, inv.description, inv.rental_price]
+        inputs = ["1",               # main.add_new_item()
+                  inv.product_code,  # Input product code.
+                  inv.description,   # Input description
+                  inv.rental_price]  # Input rental price
+
         if inv == self.inventory:
-            inputs.extend(["n", "n"])
+            inputs.extend(["n",      # Not Furniture
+                           "n"])     # Not Electric Appliance
 
         elif inv == self.furniture:
-            inputs.extend(["y", inv.material, inv.size])
+            inputs.extend(["y",           # Is Furniture
+                           inv.material,  # Input Material
+                           inv.size])     # Input Size
 
         elif inv == self.appliance:
-            inputs.extend(["n", "y", inv.brand, inv.voltage])
+            inputs.extend(["n",           # Not Furniture
+                           "y",           # Is Electric Appliance
+                           inv.brand,     # Input Brand
+                           inv.voltage])  # Input Voltage
 
-        inputs.extend(["2", "q"])
+        inputs.extend(["",                # Press Enter to return to menu
+                       "2",               # main.item_info()
+                       inv.product_code,  # Valid item product code
+                       "",                # Press Enter to return to menu
+                       "2",               # main.item_info()
+                       "asd",             # Invalid product code
+                       "",                # Press Enter to return to menu
+                       "z",               # Invalid menu option
+                       "q"])              # Quit Application
 
         return inputs

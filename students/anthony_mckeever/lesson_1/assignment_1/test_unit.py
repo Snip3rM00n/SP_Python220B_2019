@@ -15,7 +15,6 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
-
 import inventory_management.main as Main
 from inventory_management.market_prices import MarketPrices
 from inventory_management.inventory_class import Inventory
@@ -200,6 +199,11 @@ class MainTests(TestCase):
         """
         Performs the assertions for the Main.add_new_item function.
         """
+        # Hold the MarketPrices.get_latest_price to restore after mock
+        # no longer needed so MarketPrices unit tests won't inadvertently
+        # fail if execution order is randomized by coverage.py
+        hold_prices = MarketPrices.get_latest_price
+
         inv_type.return_as_dictionary = MagicMock(return_value="stuff")
         MarketPrices.get_latest_price = MagicMock(return_value=5)
 
@@ -210,6 +214,9 @@ class MainTests(TestCase):
         std_out = self.stdout_intercept.getvalue()
         new_item_msg = "New inventory item added"
         self.assertTrue(std_out.count(new_item_msg) == 1)
+
+        # Restore original MarketPrices.get_latest_price
+        MarketPrices.get_latest_price = hold_prices
 
     def test_item_info_existing_item(self):
         """
