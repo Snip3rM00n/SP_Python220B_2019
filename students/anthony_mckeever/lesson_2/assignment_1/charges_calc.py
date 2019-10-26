@@ -1,3 +1,9 @@
+# Advanced Programming In Python - Lesson 2 Assigmnet 1: Automated Testing
+# RedMine Issue - SchoolOps-12
+# Code Poet: Anthony McKeever
+# Start Date: 10/24/2019
+# End Date: 10/25/2019
+
 '''
 Returns total price paid for individual rentals
 '''

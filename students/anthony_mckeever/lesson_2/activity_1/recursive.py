@@ -1,3 +1,9 @@
+# Advanced Programming In Python - Lesson 2 Activity 1: Automated Testing
+# RedMine Issue - SchoolOps-12
+# Code Poet: Anthony McKeever
+# Start Date: 10/23/2019
+# End Date: 10/23/2019
+
 """
 recursion for debuging
 """
