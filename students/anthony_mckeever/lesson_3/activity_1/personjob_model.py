@@ -20,18 +20,17 @@ from peewee import ForeignKeyField
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-logger.info('Here we define our data (the schema)')
-logger.info('First name and connect to a database (sqlite here)')
+logger.info('Naming and connecting to database...')
 
 database = SqliteDatabase('personjob.db')
 database.connect()
 database.execute_sql('PRAGMA foreign_keys = ON;') # needed for sqlite only
 
+logger.info('Defining data schema...')
+
 class BaseModel(Model):
     class Meta:
         database = database
-
-logger.info('By inheritance only we keep our model (almost) technology neutral')
 
 class Person(BaseModel):
     """
@@ -40,9 +39,9 @@ class Person(BaseModel):
     """
     logger.info('Define Person table...')
     
-    person_name = CharField(primary_key = True, max_length = 30)
-    lives_in_town = CharField(max_length = 40)
-    nickname = CharField(max_length = 20, null = True)
+    person_name = CharField(primary_key=True, max_length=30)
+    lives_in_town = CharField(max_length=40)
+    nickname = CharField(max_length=20, null=True)
     
     logger.info("Table defined successfully.")
 
@@ -54,7 +53,7 @@ class Job(BaseModel):
     logger.info('Define Job table...')
 
     job_id = CharField(primary_key=True, max_length=4)
-    job_name = CharField(max_length = 30)
+    job_name = CharField(max_length=30)
 
     logger.info("Table defined successfully.")
 
@@ -64,10 +63,10 @@ class PersonToJob(BaseModel):
     person_name = ForeignKeyField(Person, to_field="person_name")
     job_id = ForeignKeyField(Job, to_field="job_id")
 
-    start_date = DateField(formats = 'YYYY-MM-DD')
-    end_date = DateField(formats = 'YYYY-MM-DD')
+    start_date = DateField(formats='YYYY-MM-DD')
+    end_date = DateField(formats='YYYY-MM-DD')
 
-    salary = DecimalField(max_digits = 7, decimal_places = 2)
+    salary = DecimalField(max_digits=7, decimal_places=2)
     duration_days = DecimalField(max_digits=7, decimal_places=0, null=True)
 
     logger.info("Table defined successfully.")
@@ -85,7 +84,9 @@ class PersonToDepartment(BaseModel):
     logger.info('Define PersonToDepartment table...')
 
     person = ForeignKeyField(Person, to_field="person_name", null=False)
-    department = ForeignKeyField(Department, to_field="department_id", null=False)
+    department = ForeignKeyField(Department,
+                                 to_field="department_id",
+                                 null=False)
  
     logger.info("Table defined successfully.")
 
