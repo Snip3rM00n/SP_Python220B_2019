@@ -20,20 +20,9 @@ from peewee import DateTimeField
 from peewee import DecimalField
 from peewee import ForeignKeyField
 
-parser = argparse.ArgumentParser(description='Create Customers DB')
-parser.add_argument('--log-errors', action="store_true", help="Display errors in log.")
-
-logging.basicConfig(level=logging.INFO)
-LOGGER = logging.getLogger(__name__)
-
-LOGGER.info("Initializing database...")
-
 DATABASE = SqliteDatabase("customers.db")
 DATABASE.connect()
 DATABASE.execute_sql("PRAGMA foreign_keys = ON;")
-
-LOGGER.info("Database initialized successfully.")
-
 
 class BaseModel(Model):
     class Meta:
@@ -50,27 +39,3 @@ class Customers(BaseModel):
     credit_limit = DecimalField(max_digits=10, decimal_places=2)
     date_created = DateTimeField(default=datetime.datetime.now)
     date_modified = DateTimeField(default=datetime.datetime.now)
-
-
-def set_logging():
-    args = parser.parse_args()
-
-    if args.log_errors:
-        LOGGER.setLevel(logging.ERROR)
-
-def main():
-    set_logging()
-    LOGGER.info("Creating tables...")
-    
-    try:
-        DATABASE.create_tables([Customers])
-    except IntegrityError as ie:
-        LOGGER.error(ie)
-        LOGGER.info("Failed to create tables.")
-
-        if LOGGER.level < logging.ERROR:
-            LOGGER.info("To view the error run again with --log-errors")
-    
-
-if __name__ == "__main__":
-    main()
