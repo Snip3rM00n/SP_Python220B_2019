@@ -1,39 +1,47 @@
-import sys
-import csv
+# Advanced Programming In Python - Lesson 3 Assigmnet 1: Automated Testing
+# RedMine Issue - SchoolOps-13
+# Code Poet: Anthony McKeever
+# Start Date: 11/06/2019
+# End Date:
+
+"""
+Creates the customer's database.
+"""
+
 import logging
-import datetime
 import argparse
 
 from itertools import islice
 
 from peewee import SqliteDatabase
 from peewee import IntegrityError
+from peewee import OperationalError
 
 from customer_db_schema import Customers
 
-parser = argparse.ArgumentParser(description='Create Customers DB')
-parser.add_argument('--debug', type=int, default=0,
+PARSER = argparse.ArgumentParser(description='Create Customers DB')
+PARSER.add_argument('--debug', type=int, default=0,
                     help="Display errors in log.")
-parser.add_argument('--import-file', type=str, default=None,
+PARSER.add_argument('--import-file', type=str, default=None,
                     help="A CSV of customers to import.")
-parser.add_argument('--import-bandwidth', type=int, default=5,
+PARSER.add_argument('--import-bandwidth', type=int, default=5,
                     help="Max customers to hold in memory during import")
 
+
 def set_logging(level):
+    """
+    Set up logging for the application.
+
+    :level:     The level of log verbosity.
+    """
     log_level = parse_log_level(level)
-
-    formatter = str("%(asctime)s %(filename)s:%(lineno)-3d " +
-                    "%(levelname)s %(message)s")
-    log_format = logging.Formatter(formatter)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(log_level)
-    console_handler.setFormatter(log_format)
 
     logger = logging.getLogger()
     logger.setLevel(log_level)
 
-    logger.addHandler(console_handler)
+    msg = f"Logging set at level: {logging.getLevelName(log_level)}"
+    logging.info(msg)
+
 
 def parse_log_level(level):
     """
@@ -52,7 +60,11 @@ def parse_log_level(level):
 
     return log_level
 
+
 def init_database():
+    """
+    Initialize the database.
+    """
     logging.info("Initializing database...")
 
     database = SqliteDatabase("customers.db")
@@ -63,23 +75,39 @@ def init_database():
 
     return database
 
+
 def create_tabels(database):
+    """
+    Creates tables in the database.
+
+    :database:  The database to create tables in.
+    """
     logging.info("Creating tables...")
-    
-    try:
-        database.create_tables([Customers])
-    except IntegrityError as ie:
-        log_error(ie, "Failed to create tables.", should_exit=True)
 
-def import_customers(database, file):
+    database.create_tables([Customers])
+    logging.info("Tables created successfully.")
+
+def import_customers(file, bandwidth):
+    """
+    Import customers from a file.
+
+    :file:      The input CSV file.
+    :bandwidth: The number of lines to hold in memory while writting customers.
+    """
     with open(file, "r") as in_file:
-        contents = list(islice(in_file, 5))
-        
-        while len(contents) > 0:
-            write_customers(database, contents)
-            contents = list(islice(in_file, 5))
+        contents = list(islice(in_file, bandwidth))
 
-def write_customers(database, customer_list):
+        while len(contents) > 0:
+            write_customers(contents)
+            contents = list(islice(in_file, bandwidth))
+
+
+def write_customers(customer_list):
+    """
+    Write a collection of customers to the database.
+
+    :customer_list:     A list of CSV strings representing customers.
+    """
     for customer in customer_list:
         try:
             customer = customer.split(',')
@@ -93,26 +121,26 @@ def write_customers(database, customer_list):
                                               credit_limit=customer[7])
             logging.info("Customer written successfully.")
             logging.debug(current)
-        except IntegrityError as ie:
-            log_error(ie, "Failed to write customer.", should_exit=False)
+        except (IntegrityError, OperationalError) as error:
+            logging.info("Failed to write customer.")
+            logging.error(error)
             logging.debug(customer)
 
-def log_error(error, msg, should_exit):
-    logging.error(error)
-    logging.info(msg)
-
-    if should_exit:
-        logging.info("Terminating application...")
 
 def main(args):
+    """
+    The main method of the application.
+
+    :args:  The arguments from argparse
+    """
     set_logging(args.debug)
     database = init_database()
     create_tabels(database)
 
     if args.import_file is not None:
-        import_customers(database, args.import_file)
+        import_customers(args.import_file, args.import_bandwidth)
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
-    main(args)
+    ARGS = PARSER.parse_args()
+    main(ARGS)
