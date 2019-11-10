@@ -1,8 +1,8 @@
-# Advanced Programming In Python - Lesson 3 Assigmnet 1: Automated Testing
+# Advanced Programming In Python - Lesson 3 Assigmnet 1: Relational Databases
 # RedMine Issue - SchoolOps-13
 # Code Poet: Anthony McKeever
 # Start Date: 11/06/2019
-# End Date:
+# End Date: 11/09/2019
 
 """
 Tests integration between basic_operations and customer_db_schema.

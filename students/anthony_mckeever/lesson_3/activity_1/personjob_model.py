@@ -1,8 +1,8 @@
-# Advanced Programming In Python - Lesson 3 Assigmnet 1: Automated Testing
+# Advanced Programming In Python - Lesson 3 Activity 1: Relational Databases
 # RedMine Issue - SchoolOps-13
 # Code Poet: Anthony McKeever
-# Start Date: 11/06/2019
-# End Date:
+# Start Date: 10/30/2019
+# End Date: 10/31/2019
 
 """
 Simple database example with Peewee ORM, sqlite and Python
