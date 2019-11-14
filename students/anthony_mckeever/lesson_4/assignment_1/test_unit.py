@@ -254,7 +254,8 @@ class TestBasicOperations(MockDatabaseTest):
             with self.assertLogs() as mock_logger:
                 BaseOps.delete_customer("123")
 
-                msg = "INFO:basic_operations:Customer deleted successfully."
+                msg = str("INFO:basic_operations:Customer "
+                          + "with ID 123 has been deleted.")
                 self.assertIn(msg, mock_logger.output)
 
     def test_delete_customer_error_handle(self):
@@ -326,8 +327,7 @@ class TestBasicOperations(MockDatabaseTest):
     def test_list_active_customers(self):
         """ Validates active customer count """
         peewee.Model.select = MagicMock()
-        peewee.Model.select().where = MagicMock()
-        peewee.Model.select().where().count = MagicMock(return_value=3)
+        peewee.Model.select().where = MagicMock(return_value=[1, 2, 3])
 
         count = BaseOps.list_active_customers()
         self.assertEqual(3, count)

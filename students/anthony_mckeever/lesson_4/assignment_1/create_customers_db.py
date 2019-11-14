@@ -87,12 +87,13 @@ def create_tabels(database):
     database.create_tables([Customers])
     logging.info("Tables created successfully.")
 
+
 def import_customers(file, bandwidth):
     """
     Import customers from a file.
 
     :file:      The input CSV file.
-    :bandwidth: The number of lines to hold in memory while writting customers.
+    :bandwidth: The number of lines to hold in memory while writing customers.
     """
     with open(file, "r") as in_file:
         contents = list(islice(in_file, bandwidth))
@@ -108,23 +109,63 @@ def write_customers(customer_list):
 
     :customer_list:     A list of CSV strings representing customers.
     """
-    for customer in customer_list:
+    # Disable unnecessary-comprehension within this one method only.
+    # pylint: disable=unnecessary-comprehension
+    customers = [c for c in customer_generator(customer_list)]
+    write_iterator(customers, write_to_db)
+
+
+def write_iterator(customer_list, func):
+    """
+    Iterate through the list of customers and perform a desired operation.
+
+    :customer_list:     A list of CSV strings representing customers.
+    :func:              The function to perform on each iteration.
+    """
+    iterator = iter(customer_list)
+
+    while True:
         try:
-            customer = customer.split(',')
-            current = Customers.get_or_create(customer_id=customer[0],
-                                              first_name=customer[1],
-                                              last_name=customer[2],
-                                              home_address=customer[3],
-                                              phone_number=customer[4],
-                                              email_address=customer[5],
-                                              status=customer[6],
-                                              credit_limit=customer[7])
-            logging.info("Customer written successfully.")
-            logging.debug(current)
-        except (IntegrityError, OperationalError) as error:
-            logging.info("Failed to write customer.")
-            logging.error(error)
-            logging.debug(customer)
+            customer = next(iterator)
+        except StopIteration:
+            break
+        func(customer)
+
+
+def write_to_db(customer):
+    """
+    Write a customer to the DB.
+
+    This handles exceptions peewee.IntegrityError and peewee.OperationalError
+    and writes them to the log when encountered.
+
+    :customer:  The customer to write.
+    """
+    try:
+        current = Customers.get_or_create(**customer)
+        logging.info("Customer written successfully.")
+        logging.debug(current)
+    except (IntegrityError, OperationalError) as error:
+        logging.info("Failed to write customer.")
+        logging.error(error)
+        logging.debug(customer)
+
+
+def customer_generator(customer_list):
+    """
+    Yield return a customer as a dictionary from a list of comma delimited
+    strings.
+    """
+    for customer in customer_list:
+        customer = customer.split(',')
+        yield {"customer_id": customer[0],
+               "first_name": customer[1],
+               "last_name": customer[2],
+               "home_address": customer[3],
+               "phone_number": customer[4],
+               "email_address": customer[5],
+               "status": customer[6],
+               "credit_limit": customer[7]}
 
 
 def main(args):

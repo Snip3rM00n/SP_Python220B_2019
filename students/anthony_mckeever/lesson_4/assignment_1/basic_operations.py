@@ -15,9 +15,18 @@ from peewee import OperationalError
 
 from customer_db_schema import Customers
 
+# Build a file handler for the logging to export log to file.
+# File handler will have its own special formatting while the console logger
+# will continue to use the default from the logging.basicConfig for now.
+FILE_FORMAT = "%(asctime)s %(filename)s:%(lineno)-3d %(levelname)s %(message)s"
+FILE_FORMATTER = logging.Formatter(FILE_FORMAT)
+FILE_HANDLER = logging.FileHandler('db.log')
+FILE_HANDLER.setLevel(logging.INFO)
+FILE_HANDLER.setFormatter(FILE_FORMATTER)
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(FILE_HANDLER)
 
 
 def add_customer(customer_id, first_name, last_name, address,
@@ -36,8 +45,10 @@ def add_customer(customer_id, first_name, last_name, address,
     :credit_limit:      A decimal representing the customer's credit limit
     """
     if status.lower() not in ["active", "inactive"]:
-        msg = "A customer's status can only be\"active\" or \"inactive\""
-        raise ValueError(msg)
+        msg = "A customer's status can only be \"active\" or \"inactive\""
+        value_error = ValueError(msg)
+        LOGGER.error(value_error)
+        raise value_error
 
     try:
         current = Customers.get_or_create(customer_id=customer_id,
@@ -97,7 +108,7 @@ def delete_customer(customer_id):
     """
     try:
         Customers.delete_by_id(customer_id)
-        LOGGER.info("Customer deleted successfully.")
+        LOGGER.info("Customer with ID %s has been deleted.", customer_id)
     except OperationalError as op_error:
         LOGGER.info("Failed to delete customer with customer_id: %s",
                     customer_id)
@@ -134,4 +145,10 @@ def list_active_customers():
     """
     Retur a count of active customers.
     """
-    return Customers.select().where(Customers.status == "active").count()
+    # Disable unnecessary-comprehension within this one method only.
+    # pylint: disable=unnecessary-comprehension
+    actives = Customers.select().where(Customers.status == "active")
+    actives = len([c for c in actives])
+
+    LOGGER.info("Number of active customers: %i", actives)
+    return actives

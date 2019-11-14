@@ -20,7 +20,7 @@ class TestIntegration(TestCase):
 
     def setUp(self):
         customer_mock = MockCustomer()
-        
+
         # Mock Peewee as we don't need to test Peewee specific things.
         peewee.SqliteDatabase = MagicMock()
         peewee.SqliteDatabase.connect = MagicMock()
@@ -29,6 +29,8 @@ class TestIntegration(TestCase):
         peewee.Model.delete = MagicMock()
         peewee.Model.get_or_create = MagicMock(return_value=[customer_mock])
         peewee.Model.get_or_none = MagicMock(return_value=customer_mock)
+        peewee.Model.select = MagicMock()
+        peewee.Model.select().where = MagicMock(return_value=[1, 2, 3])
 
     def test_integration(self):
         """
@@ -53,4 +55,4 @@ class TestIntegration(TestCase):
         self.assertEqual(customer.credit_limit, 2.71)
 
         BaseOps.delete_customer("123")
-        self.assertEqual(0, BaseOps.list_active_customers())
+        self.assertEqual(3, BaseOps.list_active_customers())
