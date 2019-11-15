@@ -1,8 +1,8 @@
-# Advanced Programming In Python - Lesson 3 Assigmnet 1: Relational Databases
-# RedMine Issue - SchoolOps-13
+# Advanced Programming In Python - Lesson 4 Assigmnet 1: Iterators, Generators and Comprehensions
+# RedMine Issue - SchoolOps-14
 # Code Poet: Anthony McKeever
-# Start Date: 11/06/2019
-# End Date: 11/09/2019
+# Start Date: 11/13/2019
+# End Date: 11/14/2019
 
 """
 Creates the customer's database.
