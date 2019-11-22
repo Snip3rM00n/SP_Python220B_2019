@@ -47,25 +47,25 @@ class TestDatabase(TestCase):
             self.assertEqual(0, ingest_val[0])  # Validate no errors occured.
 
 
-    #def test_ingest_file_duplicate_key(self):
-    #    contents = str("test1,test2,test3" + 
-    #                   "\nval1:1,val1:2,val1:3")
-    #    open_mock = mock.mock_open(read_data=contents)
-#
-    #    with patch("builtins.open", open_mock):
-    #        Database.MongoDBConnection = MagicMock()
-    #        Database.MongoDBConnection().hp_norton = MagicMock()
-    #        Database.MongoDBConnection().hp_norton["test"] = MagicMock()
-    #        Database.MongoDBConnection().hp_norton["test"].insert_one = MagicMock()
-    #        Database.MongoDBConnection().hp_norton["test"].insert_one.side_effect = [DuplicateKeyError("Test")]
-#
-    #        ingest_val = Database.ingest_file(Database.MongoClient(),
-    #                                          ".",
-    #                                          "file",
-    #                                          "test")
-#
-    #        self.assertEqual(2, len(ingest_val))
-    #        self.assertEqual(1, ingest_val[0])
+    def test_ingest_file_duplicate_key(self):
+        contents = str("test1,test2,test3" + 
+                       "\nval1:1,val1:2,val1:3")
+        open_mock = mock.mock_open(read_data=contents)
+
+        with patch("builtins.open", open_mock):
+            Database.MongoDBConnection = MagicMock()
+            Database.MongoDBConnection().hp_norton = MagicMock()
+            Database.MongoDBConnection().hp_norton["test"] = MagicMock()
+            Database.MongoDBConnection().hp_norton["test"].insert_one = MagicMock()
+            Database.MongoDBConnection().hp_norton["test"].insert_one.side_effect = [DuplicateKeyError("Test")]
+
+            ingest_val = Database.ingest_file(Database.MongoClient(),
+                                              ".",
+                                              "file",
+                                              "test")
+
+            self.assertEqual(2, len(ingest_val))
+            self.assertEqual(1, ingest_val[0])
             
     def test_ingest_file_not_found(self):
         open_mock = mock.mock_open()
