@@ -2,7 +2,7 @@
 # RedMine Issue - SchoolOps-16
 # Code Poet: Anthony McKeever
 # Start Date: 01/01/2019
-# End Date:
+# End Date: 01/02/2019
 
 """
 A module for expanding the data in a given CSV file.
@@ -19,13 +19,14 @@ from datetime import date, timedelta
 
 PARSER = argparse.ArgumentParser(description="Expands the data of a CSV file")
 PARSER.add_argument('--file', type=str, default="data/exercise.csv",
-                    help="The file to expand.")
+                    help="The file to expand. (Default = data/exercise.csv)")
 PARSER.add_argument("--expand-to", type=int, default=1000000,
                     help=str("The total amount of lines to expand the file by "
                              + "including the number of lines already in the "
-                             + "file."))
+                             + "file.  (Default = 1000000)"))
 PARSER.add_argument("--notify-iterval", type=int, default=50000,
-                    help="How many lines to write between progress statement.")
+                    help=str("How many lines to write between progress"
+                             + "statement.  (Default = 50000)"))
 
 
 class DataLine():
@@ -36,13 +37,15 @@ class DataLine():
         self.line_number = line
         self.guid = uuid.uuid4()
         self.rand_date = date.today() + timedelta(days=rand)
+
+        # Assign an "ao" at a pseudo random rate.
         self.ao_value = "ao" if rand % 10 == 3 else ""
 
     @property
     def get_ints(self):
         """
         Return a range of integers between the self.line_number
-        and self.line_number + 4
+        and self.line_number + 4 (exclusive end)
         """
         return range(self.line_number, self.line_number + 4)
 
