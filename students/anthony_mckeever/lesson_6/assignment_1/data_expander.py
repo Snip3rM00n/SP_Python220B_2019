@@ -11,7 +11,6 @@ A module for expanding the data in a given CSV file.
 import argparse
 import os
 import random
-import sys
 import uuid
 
 from datetime import date, timedelta
@@ -52,19 +51,23 @@ class DataLine():
     def __str__(self):
         ints = ",".join([str(i) for i in self.get_ints])
         write_date = self.rand_date.strftime("%m/%d/%Y")
+
+        # Set a new line character as long as the line number is not the first
+        # to prevent a blank line being appeneded to a brand new CSV file.
         new_line = "\n" if self.line_number > 1 else ""
         return f"{new_line}{self.guid},{ints},{write_date},{self.ao_value}"
 
 
 def get_current_count(file_name):
     """
-    Return the count of lines in a file.
+    Return the count of lines in a file.  Assumes a new file if the path does
+    not exist.
 
-    :file_name:         The path to the CSV.
+    :file_name:     The path to the CSV.
     """
     if not os.path.exists(file_name):
-        print(f"The file \"{file_name}\" does not exist.")
-        sys.exit(1)
+        print(f"The file \"{file_name}\" does not exist.  Assuming new file.")
+        return 0
 
     return sum(1 for line in open(file_name))
 
