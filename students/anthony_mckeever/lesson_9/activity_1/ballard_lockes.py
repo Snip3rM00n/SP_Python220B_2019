@@ -2,7 +2,7 @@
 # RedMine Issue - SchoolOps-15
 # Code Poet: Anthony McKeever
 # Start Date: 01/22/2019
-# End Date:
+# End Date: 01/22/2019
 
 """
 A module for managing the Ballard Lockes
