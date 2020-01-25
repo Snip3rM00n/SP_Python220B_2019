@@ -1,8 +1,8 @@
-# Advanced Programming In Python - Lesson 2 Assigmnet 1: Automated Testing
-# RedMine Issue - SchoolOps-12
+# Advanced Programming In Python - Lesson 9 Assignment 1.1: Decorators
+# RedMine Issue - SchoolOps-15
 # Code Poet: Anthony McKeever
-# Start Date: 10/24/2019
-# End Date: 10/25/2019
+# Start Date: 01/22/2019
+# End Date: 01/22/2019
 
 '''
 Returns total price paid for individual rentals
@@ -51,6 +51,15 @@ import math
 import sys
 
 from argparse import RawTextHelpFormatter
+
+
+def loggable(func):
+    def logged(*args, **kwargs):
+        logging.info("Entering Function: %s", func.__name__)
+        return_val = func(*args, **kwargs)
+        logging.info("Exiting Function: %s", func.__name__)
+        return return_val
+    return logged
 
 
 def parse_cmd_arguments():
@@ -135,14 +144,13 @@ def parse_log_level(level):
     return log_level
 
 
+@loggable
 def load_rentals_file(filename):
     """
     Read a JSON file with rental settings.
 
     :filename:  The file to parse.
     """
-    logging.info("Enter load_rentals_file")
-
     try:
         with open(filename) as file:
             data = json.load(file)
@@ -153,10 +161,10 @@ def load_rentals_file(filename):
         sys.exit(1)  # Exit with code to tell OS a problem occured.
 
     logging.debug("%s loaded successfully", filename)
-    logging.info("Exit load_rentals_file")
     return data
 
 
+@loggable
 def calculate_additional_fields(data):
     """
     Calculates additional values and appends them to the data.
@@ -168,8 +176,6 @@ def calculate_additional_fields(data):
 
     :data:  The data to process.
     """
-    logging.info("Enter calculate_additional_fields")
-
     for value in data.values():
         try:
             rental_start = datetime.datetime.strptime(value['rental_start'],
@@ -191,10 +197,10 @@ def calculate_additional_fields(data):
             logging.error(value_error)
             logging.debug("Exception logged for %s", str(value))
 
-    logging.info("Exit calculate_additional_fields")
     return data
 
 
+@loggable
 def save_to_json(filename, data):
     """
     Saves the data to a file.
@@ -202,8 +208,6 @@ def save_to_json(filename, data):
     :filename:  The name of the file to write
     :data:      The data to write to the file.
     """
-    logging.info("Enter save_to_json")
-
     try:
         with open(filename, 'w') as file:
             json.dump(data, file)
@@ -215,14 +219,17 @@ def save_to_json(filename, data):
         sys.exit(1)  # Exit with code to tell OS a problem occured.
 
     logging.debug("Data saved to %s successfully.", filename)
-    logging.info("Exit save_to_json")
+
+
+def main(args):
+    set_logging(args.debug)
+
+    data = load_rentals_file(ARGS.input)
+    data = calculate_additional_fields(data)
+
+    save_to_json(args.output, data)
 
 
 if __name__ == "__main__":
     ARGS = parse_cmd_arguments()
-    set_logging(ARGS.debug)
-
-    DATA = load_rentals_file(ARGS.input)
-    DATA = calculate_additional_fields(DATA)
-
-    save_to_json(ARGS.output, DATA)
+    main(ARGS)

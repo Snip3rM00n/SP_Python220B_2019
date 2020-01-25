@@ -1,8 +1,8 @@
-# Advanced Programming In Python - Lesson 5 Assignment 1: Customer NoSQL DB
+# Advanced Programming In Python - Lesson 9 Assignment 1.2: Context Managers
 # RedMine Issue - SchoolOps-15
 # Code Poet: Anthony McKeever
-# Start Date: 11/20/2019
-# End Date: 12/02/2019
+# Start Date: 01/22/2019
+# End Date: 01/23/2019
 
 """
 Customer and Product Database Helper
@@ -40,6 +40,29 @@ class MongoDBConnection():
         self.connection.close()
 
 
+class HPNorton(MongoDBConnection):
+    """
+    Context Managing class for the HP_Norton database using a MongoDBConnection
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.database = None
+
+    def __enter__(self):
+        super().__enter__()
+        self.database = self.connection.hp_norton
+        return self
+
+    def get_collection(self, collection):
+        """
+        Return a collection from the database.
+
+        :collection:    The collection to acquire
+        """
+        return self.database[collection]
+
+
 def format_row_integers(row):
     """
     Formats all integer fields in a row from strings to integers
@@ -56,7 +79,7 @@ def format_row_integers(row):
     return row
 
 
-def ingest_file(database, directory, file_name, collection):
+def ingest_file(db_collection, directory, file_name):
     """
     Ingests a file into the MongoDB collection.
     Return how many errors was encounterd and how many documents the collection
@@ -68,7 +91,6 @@ def ingest_file(database, directory, file_name, collection):
     :collection:    The name of the collection to ingest the file to.
     """
     file_path = os.path.join(directory, file_name)
-    db_collection = database[collection]
     errors = 0
 
     try:
@@ -108,34 +130,31 @@ def import_data(directory_name, product_file, customer_file, rentals_file):
     :customer_file:     The name of the CSV file containing customers.
     :rentals_file:      The name of the CSV file containing rentals.
     """
-    mongo = MongoDBConnection()
+    hp_norton = HPNorton()
 
-    product_errors, customer_errors, rentals_errors = 0, 0, 0
-    products, customers, rentals = 0, 0, 0
+    collections = {"products": product_file,
+                   "customers": customer_file,
+                   "rentals": rentals_file}
 
-    with mongo:
-        database = mongo.connection.hp_norton
+    counts = {"products": {"errors": 0, "count": 0},
+              "customers": {"errors": 0, "count": 0},
+              "rentals": {"errors": 0, "count": 0}}
 
-        LOGGER.info("Importing products...")
-        product_errors, products = ingest_file(database,
-                                               directory_name,
-                                               product_file,
-                                               "products")
+    with hp_norton as database:
+        for collection_name, csv_file in collections.items():
+            LOGGER.info("Importing %s...", collection_name)
+            collect = database.get_collection(collection_name)
+            errors, count = ingest_file(collect, directory_name, csv_file)
 
-        LOGGER.info("Importing customers...")
-        customer_errors, customers = ingest_file(database,
-                                                 directory_name,
-                                                 customer_file,
-                                                 "customers")
+            counts[collection_name]["errors"] = errors
+            counts[collection_name]["count"] = count
 
-        LOGGER.info("Importing rentals...")
-        rentals_errors, rentals = ingest_file(database,
-                                              directory_name,
-                                              rentals_file,
-                                              "rentals")
-
-    records = (products, customers, rentals)
-    errors = (product_errors, customer_errors, rentals_errors)
+    records = (counts["products"]["count"],
+               counts["customers"]["count"],
+               counts["rentals"]["count"])
+    errors = (counts["products"]["errors"],
+              counts["customers"]["errors"],
+              counts["rentals"]["errors"])
     return records, errors
 
 
@@ -153,18 +172,18 @@ def show_available_products():
         }
     }
     """
-    mongo = MongoDBConnection()
+    hp_norton = HPNorton()
     query = {"quantity_available": {"$gt": 0}}
     available_products = {}
 
     LOGGER.info("Gathering available products.")
     LOGGER.debug("Products query: \"%s\"", query)
 
-    with mongo:
-        products_collection = mongo.connection.hp_norton["products"]
+    with hp_norton as database:
+        products_collection = database.get_collection("products")
         products = products_collection.find(query)
 
-        LOGGER.info("Found %d available products.", products.count)
+        LOGGER.info("Found %d available products.", products.count(False))
         for product in products:
             prod_key = None
             prod_detail = {}
@@ -197,19 +216,19 @@ def show_rentals(product_id):
 
     :product_id:    The product to query.
     """
-    mongo = MongoDBConnection()
+    hp_norton = HPNorton()
     query = {"product_id": product_id}
     renting_customers = {}
 
     LOGGER.info("Gathering rentals for %s.", product_id)
     LOGGER.debug("Rentals query: \"%s\"", query)
 
-    with mongo:
-        customer_collection = mongo.connection.hp_norton["customers"]
-        rental_collection = mongo.connection.hp_norton["rentals"]
+    with hp_norton as database:
+        customer_collection = database.get_collection("customers")
+        rental_collection = database.get_collection("rentals")
         rentals = rental_collection.find(query)
 
-        LOGGER.info("Found %d rentals for product.", rentals.count)
+        LOGGER.info("Found %d rentals for product.", rentals.count(False))
         for rental in rentals:
             # Do not log customers to prevent exposure of PII to unauthorized
             # users or developers.
