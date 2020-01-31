@@ -1,9 +1,10 @@
-# Advanced Programming In Python - Lesson 7 Assignment 1:
-#                                  Threading & Concurrency
-# RedMine Issue - SchoolOps-17
+# Advanced Programming In Python - Lesson 10 Assignment 1: Meta Programming
+# RedMine Issue - SchoolOps-20
 # Code Poet: Anthony McKeever
-# Start Date: 01/10/2020
-# End Date: 01/11/2020
+# Start Date: 01/30/2020
+# End Date: 01/30/2020
+# This program was borrowed directly from Lesson 7 Assignment 1 with minor
+# modifications.
 
 """
 Expand the data of the MongoDB Input Files
